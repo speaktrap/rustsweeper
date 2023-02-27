@@ -7,14 +7,29 @@ fn letter_to_index(letter: char) -> usize {
     (uppercase_letter as u8 - b'A' + 1) as usize
 }
 
-fn read_input() -> (usize, usize) {
-	let mut input = String::new();
-	io::stdin().read_line(&mut input).expect("Failed to read line");
-	let input = input.trim();
-
-	let column_num: usize = letter_to_index((&input[0..1]).chars().next().unwrap());
-	let row_num: usize= (&input[1..]).parse().unwrap();
-	return (column_num-1,row_num-1);
+fn read_input(max_x: usize, max_y: usize) -> (usize, usize) {
+	let mut x: usize;
+	let mut y: usize;
+	loop {
+		let mut input = String::new();
+		io::stdin().read_line(&mut input).expect("Failed to read line");
+		let input = input.trim();
+		
+		if (&input[0..1]).chars().next().expect("Expect letter").is_alphabetic() {
+			x = letter_to_index((&input[0..1]).chars().next().unwrap());
+		} else {
+			x = max_x + 1;
+			}
+		if (&input[1..]).chars().next().expect("Expect number").is_numeric() {
+			y = (&input[1..]).parse().unwrap();
+		} else {
+			y = max_y + 1;
+			}
+		if x>0 && x<=max_x && y>0 && y<=max_y {
+			break;
+			} 
+		}
+	(x-1,y-1)
 }
 
 fn next_char(c: &mut char) {
@@ -123,14 +138,15 @@ fn main() {
 			println!("Good job mate :)");
 			break}
 			else {println!("There are {} tiles left", left_to_uncover);}
-			
-		let (x, y) = read_input();
 		
-		let res = map[x][y];
-		if res == 9 {
+		let (x, y) = read_input(width, height);
+		
+		let value = map[x][y];
+		if value  == 9 {
 			print_map(map, true);
 			println!("You died :(");
-			break}
+			break
+			}
 		
 		let mut stack: [(usize, usize); 256] = [(0, 0); 256];
 		let mut stack_len = 1;
