@@ -35,38 +35,42 @@ fn write_abc(l: usize) -> String {
 	
 fn print_map<const height: usize, const width: usize>(map: [[i32; width]; height], show_mines: bool) -> i32 {		
 	clearscreen::clear().unwrap();
-	println!();println!();
-	println!("{}", write_abc(width));println!();
+	println!();
+	println!("{}", write_abc(width));
+	println!();
 	let mut left_to_uncover = 0;
 	for j in 0..height {
 		if j<9 {print!(" ");}
 		print!("{}  ", j+1);
 		for i in 0..width {
-			let res = map[i][j];
-			if res == 10 {
-				print!(". ")
+			let value = map[i][j];
+			if value < 9 {
+				//if show_mines == true {
+				//	print!("{} ", value);
+				//} else {
+					left_to_uncover += 1;
+					print!("◼ ");
+					//}
 				}
-			if res == 9 {
+			if value == 9 {
 				if show_mines == true {
 					print!("* ");
 				} else {
 					print!("◼ ");
 					}
 				}
-			if res > 10 {
-				print!("{} ", res-10)
+			if value == 10 {
+				print!(". ")
 				}
-			if res < 9 {
-				if show_mines == true {
-					print!("{} ", res);
-				} else {
-					left_to_uncover += 1;
-					print!("◼ ");
-					}
+			
+			if value > 10 {
+				print!("{} ", value-10)
 				}
+			
 			}
 		println!();
 		}
+	println!();
 	left_to_uncover
 	}
 
@@ -110,25 +114,21 @@ fn main() {
 			}
 		}
 
-	//let mut x: usize;
-	//let mut y: usize;
 	let mut left_to_uncover: i32;
 
 	loop {
 		left_to_uncover = print_map(map, false);
 		if left_to_uncover == 0 {
 			print_map(map, true);
-			println!();
 			println!("Good job mate :)");
 			break}
-			else {println!();println!("There are {} tiles left", left_to_uncover);}
+			else {println!("There are {} tiles left", left_to_uncover);}
 			
 		let (x, y) = read_input();
 		
 		let res = map[x][y];
 		if res == 9 {
 			print_map(map, true);
-			println!();
 			println!("You died :(");
 			break}
 		
