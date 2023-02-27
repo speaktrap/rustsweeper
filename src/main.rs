@@ -32,11 +32,48 @@ fn write_abc(l: usize) -> String {
 		}
 	return ret;
 	}
+	
+fn print_map<const height: usize, const width: usize>(map: [[i32; width]; height], show_mines: bool) -> i32 {		
+	clearscreen::clear().unwrap();
+	println!();println!();
+	println!("{}", write_abc(width));println!();
+	let mut left_to_uncover = 0;
+	for j in 0..height {
+		if j<9 {print!(" ");}
+		print!("{}  ", j+1);
+		for i in 0..width {
+			let res = map[i][j];
+			if res == 10 {
+				print!(". ")
+				}
+			if res == 9 {
+				if show_mines == true {
+					print!("* ");
+				} else {
+					print!("◼ ");
+					}
+				}
+			if res > 10 {
+				print!("{} ", res-10)
+				}
+			if res < 9 {
+				if show_mines == true {
+					print!("{} ", res);
+				} else {
+					left_to_uncover += 1;
+					print!("◼ ");
+					}
+				}
+			}
+		println!();
+		}
+	left_to_uncover
+	}
 
 fn main() {
 	const width: usize = 12;
 	const height: usize = 12;
-	const luck: i32 = 4;
+	const luck: i32 = 8;
 
 	let mut rng = rand::thread_rng();
 	let chance = Uniform::from(0..luck);
@@ -73,29 +110,14 @@ fn main() {
 			}
 		}
 
-	let mut guess = String::new();
-	let mut x: usize;
-	let mut y: usize;
+	//let mut x: usize;
+	//let mut y: usize;
 	let mut left_to_uncover: i32;
 
 	loop {
-		clearscreen::clear().unwrap();
-		println!();println!();
-		println!("{}", write_abc(width));println!();
-		left_to_uncover = 0;
-		for j in 0..height {
-			if j<9 {print!(" ");}
-			print!("{}  ", j+1);
-			for i in 0..width {
-				let res = map[i][j];
-				if res == 10 {print!(". ")};
-				if res < 10 {print!("◼ ")};
-				if res > 10 {print!("{} ", res-10)};
-				if res < 9 {left_to_uncover += 1}
-				}
-			println!();
-			}
+		left_to_uncover = print_map(map, false);
 		if left_to_uncover == 0 {
+			print_map(map, true);
 			println!();
 			println!("Good job mate :)");
 			break}
@@ -105,6 +127,8 @@ fn main() {
 		
 		let res = map[x][y];
 		if res == 9 {
+			print_map(map, true);
+			println!();
 			println!("You died :(");
 			break}
 		
@@ -115,10 +139,13 @@ fn main() {
 		while stack_len > 0 {
 			stack_len -= 1;
 			let (x, y) = stack[stack_len];
-			if map[x][y] > 8 {
+			if map[x][y] != 0 {
+				if map[x][y] < 9 {
+					map[x][y] += 10;
+					}
 				continue;
 			}
-			map[x][y] += 10;	
+			map[x][y] = 10;	
 
 			if x > 0 {
 				stack[stack_len] = (x - 1, y);
